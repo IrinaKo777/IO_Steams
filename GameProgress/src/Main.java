@@ -1,12 +1,31 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class Main {
+    private static StringBuilder stringBuilder = new StringBuilder();
+    private static String[] dirName = {"C://GamesNew/temp", "C://GamesNew/src", "C://GamesNew/res",
+            "C://GamesNew/savegames", "C://GamesNew/src/main", "C://GamesNew/src/test",
+            "C://GamesNew/res/drawables", "C://GamesNew/res/vectors", "C://GamesNew/res/icons"
+    };
+
+    private static String[] fileName = {"C://GamesNew/temp/temp.txt", "C://GamesNew/src/main/Main.java", "C://GamesNew/src/main/Utils.java"};
+
     public static void main(String[] args) {
+        createNewDir(dirName);
+        createNewFile(fileName);
+
+        try (FileWriter log = new FileWriter("C://GamesNew/temp/temp.txt", true)) {
+            log.write(String.valueOf(stringBuilder));
+            log.flush();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
         GameProgress gp1 = new GameProgress(8, 2, 15, 34);
         GameProgress gp2 = new GameProgress(10, 3, 18, 152);
         GameProgress gp3 = new GameProgress(12, 5, 20, 341);
@@ -18,7 +37,7 @@ public class Main {
         list.add("C://GamesNew/savegames/save2.dat");
         list.add("C://GamesNew/savegames/save3.dat");
         zipFiles("C://GamesNew/savegames/zip.zip", list);
-        openZip("C://GamesNew/savegames/zip.zip", "C://GamesNew/savegames/");
+        openZip("C://GamesNew/savegames/zip.zip");
         openProgress("C://GamesNew/savegames/save3.dat");
     }
 
@@ -49,18 +68,18 @@ public class Main {
         for (String file : list) {
             File file1 = new File(file);
             if (file1.delete()) {
-                System.out.println("Файл " + file + " удален");
+                stringBuilder.append(new Date() + " - Файл " + file + " удален" + "\n");
             }
         }
     }
 
-    public static void openZip(String path, String zipPath) {
+    public static void openZip(String path) {
         try (ZipInputStream zin = new ZipInputStream(new FileInputStream(path))) {
             ZipEntry entry;
-            //String name;
+            String name;
             while ((entry = zin.getNextEntry()) != null) {
-                zipPath = entry.getName();
-                FileOutputStream fout = new FileOutputStream(zipPath);
+                name = entry.getName();
+                FileOutputStream fout = new FileOutputStream(name);
                 for (int c = zin.read(); c!= -1; c = zin.read()) {
                     fout.write(c);
                 }
@@ -82,6 +101,31 @@ public class Main {
             System.out.println(e.getMessage());
         }
         System.out.println(gp);
+    }
+
+    public static void createNewDir(String[] mass) {
+        for (int i = 0; i < mass.length; i++) {
+            File dir = new File(mass[i]);
+            if (dir.mkdir()) {
+                stringBuilder.append(new Date() + " - Каталог " + mass[i] + " создан" + "\n");
+
+            } else {
+                stringBuilder.append(new Date() + " - Каталог " + mass[i] + " не удалось создать" + "\n");
+            }
+        }
+    }
+
+    public static void createNewFile(String[] mass) {
+        for (int i = 0; i < mass.length; i++) {
+            File file = new File(mass[i]);
+            try {
+                if (file.createNewFile()) {
+                    stringBuilder.append(new Date() + " - Файл " + mass[i] + " создан" + "\n");
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
 }
