@@ -19,12 +19,12 @@ public class Main {
         createNewDir(dirName);
         createNewFile(fileName);
 
-        try (FileWriter log = new FileWriter("C://GamesNew/temp/temp.txt", true)) {
-            log.write(String.valueOf(stringBuilder));
-            log.flush();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+//        try (FileWriter log = new FileWriter("C://GamesNew/temp/temp.txt", true)) {
+//            log.write(String.valueOf(stringBuilder));
+//            log.flush();
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        }
 
         GameProgress gp1 = new GameProgress(8, 2, 15, 34);
         GameProgress gp2 = new GameProgress(10, 3, 18, 152);
@@ -39,7 +39,18 @@ public class Main {
         zipFiles("C://GamesNew/savegames/zip.zip", list);
         openZip("C://GamesNew/savegames/zip.zip");
         openProgress("C://GamesNew/savegames/save3.dat");
+
     }
+
+    public static void logger(){
+        try (FileWriter log = new FileWriter("C://GamesNew/temp/temp.txt", true)) {
+            log.write(String.valueOf(stringBuilder));
+            log.flush();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 
     public static void saveGame (String path, GameProgress gp) {
         try (FileOutputStream fos = new FileOutputStream(path);
@@ -52,8 +63,9 @@ public class Main {
 
     public static void zipFiles(String path, List<String> list) {
         try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(path));
-             FileInputStream fis = new FileInputStream(path)) {
+             ) {
             for (String x : list) {
+                FileInputStream fis = new FileInputStream(x);
                 ZipEntry entry = new ZipEntry(x);
                 zout.putNextEntry(entry);
                 byte[] buffer = new byte[fis.available()];
@@ -68,7 +80,8 @@ public class Main {
         for (String file : list) {
             File file1 = new File(file);
             if (file1.delete()) {
-                stringBuilder.append(new Date() + " - Файл " + file + " удален" + "\n");
+                stringBuilder.append(new Date()).append(" - Файл ").append(file).append(" удален \n");
+                logger();
             }
         }
     }
@@ -106,13 +119,15 @@ public class Main {
     public static void createNewDir(String[] mass) {
         for (int i = 0; i < mass.length; i++) {
             File dir = new File(mass[i]);
+            stringBuilder.append(new Date());
             if (dir.mkdir()) {
-                stringBuilder.append(new Date() + " - Каталог " + mass[i] + " создан" + "\n");
+                stringBuilder.append(" - Каталог ").append(mass[i]).append(" создан \n");
 
             } else {
-                stringBuilder.append(new Date() + " - Каталог " + mass[i] + " не удалось создать" + "\n");
+                stringBuilder.append(" - Каталог ").append(mass[i]).append(" не создан! \n");
             }
         }
+        logger();
     }
 
     public static void createNewFile(String[] mass) {
@@ -120,12 +135,13 @@ public class Main {
             File file = new File(mass[i]);
             try {
                 if (file.createNewFile()) {
-                    stringBuilder.append(new Date() + " - Файл " + mass[i] + " создан" + "\n");
+                    stringBuilder.append(new Date()).append(" - Файл ").append(mass[i]).append(" создан \n");;
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         }
+        logger();
     }
 
 }
